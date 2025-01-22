@@ -2,6 +2,7 @@
 - name: Add a user with a specific shell
   hosts: radius
   become: yes
+  become_method: sudo
   tasks:
     - name: Create user with bash shell
       user:
