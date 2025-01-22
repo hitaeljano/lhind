@@ -4,6 +4,13 @@
   become: yes
   become_method: sudo
   tasks:
+    - name: Debug current effective user
+      command: whoami
+      register: whoami_output
+
+    - debug:
+        var: whoami_output.stdout
+
     - name: Create user with bash shell
       user:
         name: U788857
