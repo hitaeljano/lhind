@@ -1,0 +1,9 @@
+---
+- name: Add a user with a specific shell
+  hosts: radius
+  become: yes
+  tasks:
+    - name: Create user with bash shell
+      user:
+        name: U788857
+        shell: /bin/bash
