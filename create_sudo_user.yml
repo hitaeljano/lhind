@@ -1,0 +1,32 @@
+- name: Create and configure users
+  hosts: freeradius
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  vars:
+    users:
+      - test1
+      - test2
+
+  tasks:
+    - name: Create non-existing users
+      user:
+        name: "{{ item }}"  
+        createhome: yes  
+        shell: /bin/bash 
+      loop: "{{ users }}" 
+      ignore_errors: true
+
+    - name: Fetch user groups
+      command: groups {{ item }}
+      loop: "{{ users }}"
+      register: user_groups
+
+    - name: Add users to sudo group (if non-existing)
+      user:
+        name: "{{ item.item }}"
+        groups: sudo
+        append: yes
+      loop: "{{ user_groups.results }}"
+      when: "'sudo' not in item.stdout"

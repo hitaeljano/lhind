@@ -11,6 +11,13 @@
         name: libpam-radius-auth
         state: present
 
+    - name: Modify sudo group line for passwordless access
+      lineinfile:
+        dest: /etc/sudoers
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+        state: present
+
     - name: Ensure UsePAM yes is present and uncommented
       lineinfile:
         path: /etc/ssh/sshd_config
