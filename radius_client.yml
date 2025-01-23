@@ -1,6 +1,6 @@
 ---
 - name: Configure SSH for Radius Authentication
-  hosts: freeradius
+  hosts: docker-services
   gather_facts: true
   become: true
   become_method: sudo
