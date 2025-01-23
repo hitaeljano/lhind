@@ -31,6 +31,19 @@
         line: 'auth  sufficient   pam_radius_auth.so'
         insertbefore: BOF
 
+    - name: Read the file content
+      command: cat /etc/pam_radius_auth.conf
+      register: file_content
+
+    - name: Comment all lines in the file
+      copy:
+        dest: /etc/pam_radius_auth.conf
+        content: |
+          {% for line in file_content.stdout_lines %}
+          # {{ line }}
+          {% endfor %}
+      when: file_content.stdout is defined
+
     - name: Insert Radius server configuration in pam_radius_auth.conf
       blockinfile:
         path: /etc/pam_radius_auth.conf
