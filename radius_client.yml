@@ -1,0 +1,44 @@
+---
+- name: Configure SSH for Radius Authentication
+  hosts: freeradius
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Install libpam-radius-auth
+      apt:
+        name: libpam-radius-auth
+        state: present
+
+    - name: Ensure UsePAM yes is present and uncommented
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?UsePAM'
+        line: 'UsePAM yes'
+        state: present
+
+    - name: Ensure ChallengeResponseAuthentication yes is present and uncommented or added
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?ChallengeResponseAuthentication'
+        line: 'ChallengeResponseAuthentication yes'
+        state: present
+
+    - name: Ensure pam_radius_auth.so is at the top of /etc/pam.d/sshd
+      lineinfile:
+        path: /etc/pam.d/sshd
+        line: 'auth  sufficient   pam_radius_auth.so'
+        insertbefore: BOF
+
+    - name: Insert Radius server configuration in pam_radius_auth.conf
+      blockinfile:
+        path: /etc/pam_radius_auth.conf
+        insertafter: '^# server\[\:port\]\s+shared_secret\s+timeout\s+\(s\)\s+source_ip\s+vrf'
+        block: |
+          10.100.100.250:1812         linux123           60
+
+    - name: Restart SSH service to apply changes
+      service:
+        name: ssh
+        state: restarted

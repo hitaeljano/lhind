@@ -1,0 +1,19 @@
+- name: Create and configure users
+  hosts: freeradius
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  vars:
+    users:
+      - test1
+      - test2
+
+  tasks:
+    - name: Create non-existing users
+      user:
+        name: "{{ item }}"  
+        createhome: yes  
+        shell: /bin/bash 
+      loop: "{{ users }}" 
+      ignore_errors: true
